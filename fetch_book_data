@@ -1,0 +1,36 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+base_url="https://books.toscrape.com/catalogue/category/books_1/index.html"
+
+titles=[]
+prices=[]
+ratings=[]
+
+for page in range(1,6):
+    url=base_url.format(page)
+    res=requests.get(url)
+    ##print(res)
+
+    soup=BeautifulSoup(res.text,"html.parser")
+    ##print(soup)
+
+    books=soup.find_all('article',class_="product_pod")
+    for book in books:
+        title=book.h3.a['title']
+        titles.append(title)
+
+        price=book.find('p',class_="price_color").text
+        prices.append(price)
+
+        rating=book.find('p')['class'][1]
+        ratings.append(rating)
+
+data={
+    "Title": titles,
+    "Price": prices,
+    "Rating": ratings,
+}
+df=pd.DataFrame(data)
+df
